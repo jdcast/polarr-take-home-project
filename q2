@@ -1,0 +1,85 @@
+1)
+
+An appropriate loss function is cross-entropy.
+
+To prevent overfitting, I would employ the following possible approaches:
+  1. adding more data
+  2. making sure that classes are balanced
+  3. add regularization (dropout and/or L1/L2 regularization)
+  4. use data augmentation to possibly expand the dataset size
+
+2)
+
+Psuedo-code below.  Derivation of gradients w.r.t. weights and biases is in image of handwritten notes in repo.
+
+*Resources used:
+1) http://cs231n.github.io/neural-networks-case-study/
+2) https://web.stanford.edu/class/cs224n/readings/gradient-notes.pdf
+3) https://www.ics.uci.edu/~pjsadows/notes.pdf
+
+# Train
+
+# initialize parameters randomly
+D = 3x224x224
+H = ? # size of hidden layer
+C = ? # number of classes
+N = ? # number of samples
+X = NxD # input
+Y = NxC # ground truth
+W_1 = 0.01 * np.random.randn(D,H)
+B_1 = np.zeros((1,H))
+W_2 = 0.01 * np.random.randn(H,C)
+B_2 = np.zeros((1,C))
+
+# hyperparameters
+lr = 1e-0
+#reg = 1e-3 # not used
+num_epochs = 200
+
+# gradient descent loop
+num_examples = X.shape[0]
+for i in xrange(num_epochs):
+
+  # compute class scores, [N x C]
+  z = np.dot(X, W_1) + B_1  # [NxD] * [DxH] + [1xH]
+  h = np.maximum(z, 0) # ReLU
+  theta = np.dot(h, W_2) + B_2 # [NxH] * [HxC] + [1xC]
+
+  # compute class probabilities
+  exp_scores = np.exp(theta)
+  y_hat = exp_scores / np.sum(exp_scores, axis=1, keepdims=True) # [N x C], softmax
+
+  # compute the loss: average cross-entropy loss
+  correct_logprobs = -np.log(y_hat[range(num_examples),Y])
+  data_loss = np.sum(correct_logprobs)/num_examples # average the loss for
+  #reg_loss = 0.5*reg*np.sum(W*W) + 0.5*reg*np.sum(W2*W2) # not used
+  #loss = data_loss + reg_loss # not used
+  loss = data_loss
+
+  # compute the gradient on class scores
+  d_theta = y_hat
+  d_theta[range(num_examples),y] -= 1
+  d_theta /= num_examples
+
+  # backprop the gradient to the parameters W_2, B_2
+  dW_2 = np.dot(X.T, d_theta)
+  dB_2 = np.sum(d_theta, axis=0, keepdims=True)
+
+  # backprop the gradient to the hidden layer
+  dh = np.dot(d_theta, W_2.T)
+  # backprop the ReLU non-linearity
+  dh[h <= 0] = 0
+
+  # backprop the gradient to the parameters W_1, B_1
+  dW_1 = np.dot(X.T, dh)
+  dB_1 = np.sum(dh, axis=0, keepdims=True)
+
+  # add regularization gradient contribution, from (1/2)*lambda*W^2 term in loss
+  #dW_2 += reg * W_2 # not used
+  #dW_1 += reg * W_1 # not used
+
+  # perform a parameter update
+  W_1 += -lr * dW_1
+  B_1 += -lr * dB_1
+  W_2 += -lr * dW_2
+  B_2 += -lr * dW_2
