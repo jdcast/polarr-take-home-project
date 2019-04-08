@@ -1,0 +1,2 @@
+See commit in forked MobileNet repo here:
+https://github.com/jdcast/MobileNet/commit/1c88c69fa2013990c0958430db98704a8913e470

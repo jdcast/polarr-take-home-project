@@ -1,0 +1,2 @@
+top_5 predictions: [0.0163812  0.01446423 0.01154282 0.00909877 0.00871133]
+top_5 labels: ['bucket, pail', 'tennis ball', "plunger, plumber's helper", 'water bottle', 'cowboy hat, ten-gallon hat']
