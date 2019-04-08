@@ -1,0 +1,26 @@
+Deep Learning approaches have been on the rise and compose the state of the art in traditional CV and PR problems due
+to the following factors:
+1)  Computing resources/processing abilities have scaled in recent years (since ~2010/2012) so as to be able to efficiently
+	utilize large datasets.  Deep or rather computationaly expensive Neural Networks, which form the backbone of Deep Learning
+	today, necessarily need lots of data to converge during training.  Early pioneers in the field of Deep Learning,
+	like Geoffy Hinton, predicted this and were only able to effectively train shallow and simple neural networks.  These
+	small networks could accomplish some tasks well such as digit recognition on MNIST.  However, as was predicted by
+    early pioneers and shown more recently, deeper networks (than were trainable in the 70s-90s) were necessary to accomplish
+    more challenging tasks.  During the time of these pioneers, we had large volumes of data but our computing resources
+    were limited.  The rise of gpu/parallel computing has allowed us to fully leverage these datasets and allowed deep
+    neural network architectures to converge during their training and consequently succeed on difficult tasks.
+
+2)  The point above has had a positive feedback effect on our available data.  Even though the idea of large datasets
+	is nothing new, the rise of deep, neural networks has lended to a rise in specially curated, large datasets for CV/PR
+	problems.  This is acutely evident in the area of Deep Learning.  Furthermore, while some of these are privately
+	curated (in-house for google, etc.) there has been a sharp rise of publicly available datasets such as Imagenet, etc.
+	This has produced an uptick in contributions to the field of CV/PR from indepedent and academic researchers.
+
+3)  Neural networks offer better contextual understanding of their target problem than more traditional CV approaches.
+	It's been observed that the layers of a neural network can be thought of as learning hirearchical components of
+	their problem space that increase in complexity in the towards the latter layers of the network.  For example,
+	an early layer in the network may learn color gradients, a layer after that may learn various circular shapes and a
+	still later layer may learn various car wheels (problem dependent of course).  This allows these networks to develop
+	a deep understanding of their problem space and isolate the important features automatically.  In traditional CV approaches,
+	these features are commonly hand curated and consequently subject to human error.  Due to being hand-generated,
+	they also lack adaptibility in comparison to those learned by the neural networks of today.
