@@ -1,0 +1,37 @@
+1)  Using neural networks, the paper explored the task space in computer vision and sought to find structure, i.e.
+relationships or "taxonomies", in the task space.  Using a discretized and sampled task space, it computationally found
+relations specifying which tasks supply useful information to another task, and by how much.  For example, it showed that given
+a target task that we want to solve, there may be a collection of pretrained, task-specific networks (trained for
+separate tasks; and from scratch on large amounts of data), whose encoder features in conjunction with a transfer
+network (trained on much less data that are specific to the target task) may be able to solve the target task nearly as
+well as, if not better than, a network trained from scratch on large amounts of data for the target task alone.
+Furthermore, the paper showed the computed taxonomy from their method is largely invariant to large changes in the
+architecture of the task-specific networks, architecture of transfer function networks, amount of data available for
+training the transfer networks, datasets used, data splits used and choice of tasks from which to choose both
+source tasks as well as target tasks.
+
+2)  Considering that the paper has a shown a reliable method for discovering the wich tasks may be best transfered to
+a novel task using a relatively little data/training, deploying novel computer vision tasks (let alone ones already
+considered in the paper's task dictionary) to mobile/small, compute platforms (e.g. cellphones, etc.) may become much
+easier.  With constrained compute resources, these platforms are typically unable to run training themselves but must
+rely on cloud resources.  Now however, using the paper's "taskonomy" method, novel tasks may be able to be trained
+using the mobile platform's limited resources on the fly.
+
+3)  In order to construct a k-th order affinity matrix, I follow the basic outline in the process provided by the
+paper in section 3.3 (i.e. for the 1st-order affinity matrix) but with some small modifications.  Throughout the
+following explanation I use the notation found in the paper.  In section 3.3, the paper describes constructing W_t,
+a pairwise tournament matrix between all feasible sources for transferring to a target t.  We will do similarly for each
+higher order (i.e. k > 1) and concatenate these results by row (i.e. stack horizontally) to give our version of W_t.
+For example when k=2, we will have a constructed a submatrix of shape [|T|x(|S| choose 2)] where |S| is the
+size of our source task dictionary.  We can call this W_t_2.  The columns of this matrix will correspond to a pairing of
+2 tasks and the rows will correspond to a single task.  In effect then, element (i,j) corresponds to the transferability
+from a pair of tasks at y to a single task at i.  If we proceed in this way for all desired orders and concatenate
+them horizontally, our resulting W_t = [W_t_1, W_t_2, W_t_3, ... , W_t_k].
+The shape of W_t is [|T| x ((|S| choose 1) + (|S| choose 2) + (|S| choose k))].
+Just as done in the paper, we would then clip this matrix W_t to be in range, [0.001, 0.999].  We would also then
+divided W'_t = W_t/W_t' (W_t' = W_t transpose).  The paper would then normally proceed with finding the principal
+eigenvectors of W'_t for all tasks in T (our task set).  However, because our W'_t is no longer square we would instead
+use SVD (Singular Value Decomposition) and extract the singular vectors for all tasks in T.  This is because we would
+like to keep the notion of eigenvectors knowing that the strict mathematical formulation of eigenvectors only applies to
+square matrices.  To construct our final Task Affinity Matrix, P, we then stack these singular vectors analogous to the
+paper's treatment of its eigenvectors.
