@@ -39,7 +39,7 @@ __global__ void bgr_to_gray_kernel( unsigned char* input,
 		const unsigned char green	= input[color_index + 1];
 		const unsigned char red		= input[color_index + 2];
 
-		const float gray = 0.2989 * red  + * 0.5870 * green +  0.1140 * blue;
+		const float gray = 0.2989 * red  + 0.5870 * green +  0.1140 * blue;
 
 		output[gray_index] = static_cast<unsigned char>(gray);
 	}

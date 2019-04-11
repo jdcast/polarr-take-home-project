@@ -1,4 +1,5 @@
-references:
+References:
+0) https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#hardware-implementation
 1) http://15418.courses.cs.cmu.edu/spring2017/lecture/gpuarch/slide_060
 2) https://en.wikipedia.org/wiki/Thread_block_(CUDA_programming)
 3) https://stackoverflow.com/questions/10460742/how-do-cuda-blocks-warps-threads-map-onto-cuda-cores
@@ -7,16 +8,65 @@ references:
 6) https://www.quora.com/How-many-threads-can-a-core-contain-in-a-CPU
 
 
-GPU vs Synchronous:
-Our image is of size [1920x1080].  Size of the image ~6MB.  Thus we can fit the entire image (6MB) into local memory,
-which has a limit of 8GB.  I use 256 threads per block.  I assume each core can handle up to 8 thread blocks
-(from reference 5 below).  Using an architecture like that of the gtx1080, which supports 64 warps per core, and
-acknowledging that a warp is 32 CUDA threads, the GPU can support a total of 256*64*32 = 524288 concurrent threads.
-Thus, our max speed up over a synchronous version of the program is five orders of magnitude.
+Due to some ambiguity in the question, there were a few approaches I could think of to compare performances of the
+various implementations.  I'll go over each below.  Note, however that in all scenarios the baseline program I compare
+each implementation to is that of a single thread on the CPU (i.e. synchronous implementation).  I also assume for all
+scenarios that our image is of size [1920x1080] which gives a size of ~6MB.  Thus, we can fit the entire image into
+local memory or RAM (depending on if considering the GPU or CPU respecitvely), both of which has a limit of 8GB.  As a
+result we are not memory limited for either GPU or CPU.
 
+	Method 1:  Consider each core, on either GPU or CPU, in the "CUDA sense".  I will assume that each core is capable of
+	some number of purely, parallel threads and that this number of threads varies between GPU and CPU.  I consider the
+	cases for a minimum and maximum number of these concurrent threads in the following.
 
-CPU vs Synchronous:
-Our image is of size [1920x1080].  Size of the image ~6MB.  Thus we can fit the entire image (6MB) into RAM, which has
-a limit of 8GB.  I'll assume 8 concurrent threads per CPU core.  Thus, the max speed up over a synchronous version of the
-program is 8x or approximately one order of magnitude.
+		Minimum Case:  I assume each core on the GPU and CPU is capable of exactly 1 thread.
 
+			GPU vs Synchronous:
+				The GPU has 256 cores.  Thus, with 1 thread per core, I would assume a speed up of 256x or ~10^2 over
+				that of a synchronous implementation.
+
+			CPU vs Synchronous:
+				The CPU has 8 cores.  Thus, with 1 thread per core, I would assume a speed up of 8x or ~10^1 over
+				that of a synchronous implementation.  Note, here I am assuming that addition and multiplication
+				operations on the CPU are one clock cycle.
+
+		Maximum Case:
+
+			GPU vs Synchronous:
+				I use 256 threads per block in the GPU implementation.  I assume each core can handle up to 8 thread
+				blocks (from reference 5 above).  Using an advanced architecture like that of the gtx1080, which supports 64
+				warps per core, and taking one warp to be 32 CUDA threads of "nearby-in-memory" operations, the GPU can
+				support a total of 256*64*32 = 524288 concurrent threads. Thus, our max speed up over a synchronous
+				version of the program is ~10^5.
+
+			CPU vs Synchronous:
+				I'll assume 8 concurrent threads per CPU core as is suggested for some higher end CPUs.  Thus, the max
+				speed up over a synchronous version of the program is 8*8 = 64 or ~10^2.
+
+	Method 2:  Depending on whether the GPU or CPU is in question, we consider each core as a unified, compute block,
+	capable of no more than 2 simultaneous operations of type that is either multiplcation or addition.  Note, that considering each
+	pixel requires 5 floating point operations (3 multiplications and 2 additions).  I assume in the discussion below that
+	we intelligently package 3 multiplications and 2 additions together so that their pairing corresponds to the same pixel.
+	If I didn't assume this, then there could be added overhead/slowdown for computing multiplications and additions that don't
+	necessarily correspond to the same pixel.
+
+		GPU vs Synchronous:
+			I assume for the case of the GPU, that each core is specialized and capable of only 1 operation.  Each pixel in
+			the image requires 5 floating point operations as already noted.  Therefore, we can fit
+			256/5, or ~50, "pixel computations" onto the GPU every clock cycle.  Note, I assume floating point operations
+			on the GPU take 1 clock cycle.  Thus, we would expect ~50x or 10^1 speed up over a synchronous implementation.
+			I assume the synchronous implementation is capable of only 1 operation per clock cycle.
+			Note, the speed up may be even greater, since a synchronous implementation may have overhead for managing its
+			registers/operations that are either hidden or simply not present on the GPU.
+
+		CPU vs Synchronous:
+			I assume for the case of the CPU, each core is slighly more generalized than the GPU's cores and therefore capable
+			of 2 different operations per clock cycle.  The CPU has 8 cores.  Thus, the CPU is capable of 8*2 = 16 operations per
+			clock cycle.  Each pixel in the image requires 5 floating point operations as already noted.
+			Therefore, we can perform approximatley 16/5 = ~3 "pixel operations" per clock cycle.  As a result, I expect the
+			the speed up to be ~3x that of a synchronous implementation.  Note, I'm assuming that each operation only
+			takes 1 clock cycle to complete.  As suggested in the case of the GPU above, the performance gain over a
+			synchronous implementation could vary depending on the overhead of using a single thread in a synchronous
+			implementation.  However, I assume that in the parallel implementation, we aren't using so many threads as
+			to make thread-overhead/context-switching a bottleneck.  Thus, I wouldn't expect it to perform worse than a
+			synchronous implementation.
