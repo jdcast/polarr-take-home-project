@@ -4,6 +4,7 @@ references:
 3) https://stackoverflow.com/questions/10460742/how-do-cuda-blocks-warps-threads-map-onto-cuda-cores
 4) https://askubuntu.com/questions/668538/cores-vs-threads-how-many-threads-should-i-run-on-this-machine
 5) https://www.google.com/search?q=256*8&oq=256*8&aqs=chrome..69i57j6j0.1535j0j7&sourceid=chrome&ie=UTF-8
+6) https://www.quora.com/How-many-threads-can-a-core-contain-in-a-CPU
 
 
 GPU vs Synchronous:
