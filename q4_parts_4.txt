@@ -1,0 +1,21 @@
+references:
+1) http://15418.courses.cs.cmu.edu/spring2017/lecture/gpuarch/slide_060
+2) https://en.wikipedia.org/wiki/Thread_block_(CUDA_programming)
+3) https://stackoverflow.com/questions/10460742/how-do-cuda-blocks-warps-threads-map-onto-cuda-cores
+4) https://askubuntu.com/questions/668538/cores-vs-threads-how-many-threads-should-i-run-on-this-machine
+5) https://www.google.com/search?q=256*8&oq=256*8&aqs=chrome..69i57j6j0.1535j0j7&sourceid=chrome&ie=UTF-8
+
+
+GPU vs Synchronous:
+Our image is of size [1920x1080].  Size of the image ~6MB.  Thus we can fit the entire image (6MB) into local memory,
+which has a limit of 8GB.  I use 256 threads per block.  I assume each core can handle up to 8 thread blocks
+(from reference 5 below).  Using an architecture like that of the gtx1080, which supports 64 warps per core, and
+acknowledging that a warp is 32 CUDA threads, the GPU can support a total of 256*64*32 = 524288 concurrent threads.
+Thus, our max speed up over a synchronous version of the program is five orders of magnitude.
+
+
+CPU vs Synchronous:
+Our image is of size [1920x1080].  Size of the image ~6MB.  Thus we can fit the entire image (6MB) into RAM, which has
+a limit of 8GB.  I'll assume 8 concurrent threads per CPU core.  Thus, the max speed up over a synchronous version of the
+program is 8x or approximately one order of magnitude.
+
