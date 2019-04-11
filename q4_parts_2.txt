@@ -1,0 +1,96 @@
+"""
+References used:
+1) https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+2) http://www.programmerfish.com/how-to-write-a-custom-cuda-kernel-with-opencv-as-host-library/#.XK5TW3VKikA
+3) https://stackoverflow.com/questions/21271815/integer-rounding-in-c
+4) https://www.geeksforgeeks.org/static_cast-in-c-type-casting-operators/
+"""
+
+
+
+#include<iostream>
+#include<cstdio>
+#include<cuda_runtime.h>
+
+
+// Kernel Definition
+__global__ void bgr_to_gray_kernel( unsigned char* input,
+					unsigned char* output,
+					int width,
+					int height) 
+{
+	// 2D Index of current thread
+	const int xIndex = blockIdx.x * blockDim.x + threadIdx.x;
+	const int yIndex = blockIdx.y * blockDim.y + threadIdx.y;
+
+	const int colorBytesPerPixel = 3 // num bytes per input pixel is 3
+	const int greyBytesPerPixel = 1 // num bytes per input pixel is 1
+
+	// Only valid threads perform memory I/O
+	if((xIndex<width) && (yIndex<height))
+	{
+		// Location of colored pixel in input
+		const int color_index = yIndex * image_width * colorBytesPerPixel + (3 * xIndex);
+		
+		// Location of gray pixel in output
+		const int gray_index  = yIndex * grayBytesPerPixel + xIndex;
+
+		const unsigned char blue	= input[color_index];
+		const unsigned char green	= input[color_index + 1];
+		const unsigned char red		= input[color_index + 2];
+
+		const float gray = 0.2989 * red  + * 0.5870 * green +  0.1140 * blue;
+
+		output[gray_index] = static_cast<unsigned char>(gray);
+	}
+}
+
+void get_greyscale(const int input[], const int output[], int image_height, int image_width)
+{
+	// Calculate total number of bytes of input and output image
+	const int colorBytes = image_height * image_width * 3;
+	const int grayBytes = image_height * image_width;
+
+	unsigned char *d_input, *d_output;
+
+	// Allocate device memory
+	SAFE_CALL(cudaMalloc<unsigned char>(&d_input,colorBytes),"CUDA Malloc Failed");
+	SAFE_CALL(cudaMalloc<unsigned char>(&d_output,grayBytes),"CUDA Malloc Failed");
+
+	// Copy data from input image to device memory
+	SAFE_CALL(cudaMemcpy(d_input, input, colorBytes, cudaMemcpyHostToDevice),"CUDA Memcpy Host To Device Failed");
+
+	// Specify block size, we are allowed 256 threads per block
+	const dim3 block(16, 16);
+
+	// Calculate grid size to cover the whole image
+	// Round up so that we have enough blocks (any remainder is rounded down due to dim3 being of integer vector type)
+	const dim3 grid((input_width + block.x - 1)/block.x, (input_height + block.y - 1)/block.y);
+
+	// Launch the color conversion kernel
+	bgr_to_gray_kernel<<<grid,block>>>(d_input, d_output, image_width, image_height);
+
+	// Copy back data from destination device memory to OpenCV output image
+	SAFE_CALL(cudaMemcpy(output, d_output, grayBytes, cudaMemcpyDeviceToHost), "CUDA Memcpy Host To Device Failed");
+
+	// Free the device memory
+	SAFE_CALL(cudaFree(d_input), "CUDA Free Failed");
+	SAFE_CALL(cudaFree(d_output), "CUDA Free Failed");
+}
+
+int main()
+{
+	const int image_height = 1920;
+	const int image_width = 1080;	
+
+	// input image is 1920x1080x3 flattened to 1D array
+	const int output_greyscale[image_width*image_height] = {0};
+
+	// Create output image
+	const int output_greyscale[image_width*image_height] = {0};
+
+	// Call the wrapper function
+	get_greyscale(input,output_greyscale, image_height, image_width);
+
+	return 0;
+}
