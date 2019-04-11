@@ -19,3 +19,11 @@ int *get_greyscale(int* input)
 	}
 	return output_greyscale;
 }
+
+# Another approach might be to:
+# 1) get number of cpus available (cores)
+# 2) set up a thread pool/work queue of threads of size equal to number of cores
+# 3) programmatically set the thread affinity of each thread to a specific core
+# 4) use a master thread to manage the work queue and doll out parcels of the image to compute to each worker thread
+
+# Reference: https://eli.thegreenplace.net/2016/c11-threads-affinity-and-hyperthreading/
