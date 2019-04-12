@@ -77,18 +77,74 @@ if __name__ == "__main__":
 
         ### part 5 ###
         # write first 3 layer names/shapes to file
-        # count = 0
+        # variables = {v.name: sess.run(v) for v in tf.global_variables()}
         # with open("/home/nightrider/polarr-take-home-project/q3_parts_5_result.txt", "w") as file:
-        #     for op in sess.graph.get_operations():
-        #         if 'conv_ds_2/pw_batch_norm/moving_variance' in op.name:
-        #             print('hit 4th layer')
-        #             assert(False)
-        #         print(op.name)
-        #         print(op.values())
-        #         print("=========")
-        #         file.write("{}\n".format(op.name))
-        #         file.write("{}\n".format(op.values()))
-        #         file.write("========\n")
+        #     # first layer
+        #     key = 'MobileNet/conv_1/weights:0'
+        #     w = variables[key]
+        #     file.write("{}, {}\n".format(key, w.shape))
+        #
+        #     key = 'MobileNet/conv_1/biases:0'
+        #     b = variables[key]
+        #     file.write("{}, {}\n".format(key, b.shape))
+        #
+        #     key = 'MobileNet/conv_1/batch_norm/moving_variance:0'
+        #     var = variables[key]
+        #     file.write("{}, {}\n".format(key, var.shape))
+        #
+        #     key = 'MobileNet/conv_1/batch_norm/moving_mean:0'
+        #     mean = variables[key]
+        #     file.write("{}, {}\n".format(key, mean.shape))
+        #
+        #     key = 'MobileNet/conv_1/batch_norm/beta:0'
+        #     beta = variables[key]
+        #     file.write("{}, {}\n".format(key, beta.shape))
+        #
+        #     file.write("=================\n")
+        #
+        #     # second layer
+        #     key = 'MobileNet/conv_ds_2/depthwise_conv/depthwise_weights:0'
+        #     w = variables[key]
+        #     file.write("{}, {}\n".format(key, w.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/depthwise_conv/biases:0'
+        #     b = variables[key]
+        #     file.write("{}, {}\n".format(key, b.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/dw_batch_norm/moving_variance:0'
+        #     var = variables[key]
+        #     file.write("{}, {}\n".format(key, var.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/dw_batch_norm/moving_mean:0'
+        #     mean = variables[key]
+        #     file.write("{}, {}\n".format(key, mean.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/dw_batch_norm/beta:0'
+        #     beta = variables[key]
+        #     file.write("{}, {}\n".format(key, beta.shape))
+        #
+        #     file.write("=================\n")
+        #
+        #     # third layer
+        #     key = 'MobileNet/conv_ds_2/pointwise_conv/weights:0'
+        #     w = variables[key]
+        #     file.write("{}, {}\n".format(key, w.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/pointwise_conv/biases:0'
+        #     b = variables[key]
+        #     file.write("{}, {}\n".format(key, b.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/pw_batch_norm/moving_variance:0'
+        #     var = variables[key]
+        #     file.write("{}, {}\n".format(key, var.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/pw_batch_norm/moving_mean:0'
+        #     mean = variables[key]
+        #     file.write("{}, {}\n".format(key, mean.shape))
+        #
+        #     key = 'MobileNet/conv_ds_2/pw_batch_norm/beta:0'
+        #     beta = variables[key]
+        #     file.write("{}, {}\n".format(key, beta.shape))
 
         ### part 6 ###
         # References:
