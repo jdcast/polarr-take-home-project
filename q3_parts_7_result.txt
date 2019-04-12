@@ -1,0 +1,1 @@
+new top_5 predictions: [('other', 0.9875936917126751), ('ping-pong ball', 0.0048500295), ('pitcher, ewer', 0.0021430242), ('piggy bank, penny bank', 0.0013700324), ('pillow', 0.0013311928)]
